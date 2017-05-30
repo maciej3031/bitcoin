@@ -1,0 +1,4 @@
+Django==1.11.1
+GDAX==0.2.2
+whitenoise
+gunicorn

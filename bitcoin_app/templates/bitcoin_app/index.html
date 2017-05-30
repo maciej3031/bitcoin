@@ -1,0 +1,59 @@
+<!-- todo/templates/baselogin.html -->
+<!DOCTYPE html>
+<html lang="eng">
+<head>
+    <meta charset="UTF-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+
+    <title>Bitcoin price</title>
+
+    <meta name="description" content="Application to track current bitcoin value"/>
+    <meta name="keywords" content="bitcoin, bitcoins"/>
+    {% load static %}
+    <link href="{% static 'bitcoin_app/style.css' %}" rel="stylesheet" type="text/css">
+
+</head>
+
+<body>
+    <div id="container">
+        <h1>Bitcoin price</h1>
+            <div class="row">
+            {% if price %}
+                Current price: {{ price.price | floatformat:2}}$
+            {% endif %}
+            </div>
+
+            <div class="row">
+            {% if average %}
+                Average price*: {{ average.price__avg | floatformat:2}}$
+            {% endif %}
+            </div>
+            <div class="box">
+                <table align="center" cellpadding="3px">
+                    <thead>
+                        <th>Time</th>
+                        <th>Min</th>
+                        <th>Max</th>
+                    </thead>
+                    <tbody>
+                        {% if last_10_min %}
+                            {% for i in last_10_min %}
+                                <tr>
+                                    <td>{{ i.time__max | date:"H:i"}}</td>
+                                    <td>{{ i.price__min | floatformat:2}}$</td>
+                                    <td>{{ i.price__max | floatformat:2}}$</td>
+                                </tr>
+                            {% endfor %}
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+            <small>* From last 10 minutes</small>
+    </div>
+    <footer>
+        2017 &copy; Maciej Pęśko
+    </footer>
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+    <script src="{% static 'bitcoin_app/script.js' %}"></script>
+</body>
+</html>
