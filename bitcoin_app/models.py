@@ -44,49 +44,48 @@ class Bitcoin(models.Model):
         return time_min_max
 
 
-class GetBitcoinThread(threading.Thread):
-    def __init__(self):
-        threading.Thread.__init__(self)
-        self.shutdown_flag = threading.Event()
-        self.public_client = GDAX.PublicClient()
-        self.name = 'GetBitcoinThread'
+class bitcoinDataManager(Bitcoin):
+    class GetBitcoinThread(threading.Thread):
+        def __init__(self):
+            threading.Thread.__init__(self)
+            self.shutdown_flag = threading.Event()
+            self.public_client = GDAX.PublicClient()
+            self.name = 'GetBitcoinThread'
 
-    def run(self):
-        print('{} started'.format(self.name))
+        def run(self):
+            print('{} started'.format(self.name))
 
-        # Dane pobieramy co 5 sekund
-        while not self.shutdown_flag.is_set():
-            data = self.public_client.getProduct24HrStats()
-            price = float(data['last'])
+            # Dane pobieramy co 5 sekund
+            while not self.shutdown_flag.is_set():
+                data = self.public_client.getProduct24HrStats()
+                price = float(data['last'])
 
-            bitcoin = Bitcoin(price=price, time=timezone.now())
-            bitcoin.save()
-            time.sleep(5 - (time.time() % 5))
+                bitcoin = Bitcoin(price=price, time=timezone.now())
+                bitcoin.save()
+                time.sleep(5 - (time.time() % 5))
 
-        print('{} stopped'.format(self.name))
+            print('{} stopped'.format(self.name))
 
+    class EraseOldBitcoinThread(threading.Thread):
+        def __init__(self):
+            threading.Thread.__init__(self)
+            self.shutdown_flag = threading.Event()
+            self.name = 'EraseOldBitcoinThread'
 
-class EraseOldBitcoinThread(threading.Thread):
-    def __init__(self):
-        threading.Thread.__init__(self)
-        self.shutdown_flag = threading.Event()
-        self.name = 'EraseOldBitcoinThread'
+        def run(self):
+            print('{} started'.format(self.name))
 
-    def run(self):
-        print('{} started'.format(self.name))
+            # kasujemy rekordy starsze niż 12 min
+            while not self.shutdown_flag.is_set():
+                Bitcoin.objects.filter(time__lt=timezone.now() - timezone.timedelta(minutes=12)).delete()
+                time.sleep(5 - (time.time() % 5))
 
-        # kasujemy rekordy starsze niż 12 min
-        while not self.shutdown_flag.is_set():
-            Bitcoin.objects.filter(time__lt=timezone.now() - timezone.timedelta(minutes=12)).delete()
-            time.sleep(5 - (time.time() % 5))
+            print('{} stopped'.format(self.name))
 
-        print('{} stopped'.format(self.name))
+    class ServiceExit(Exception):
+        pass
 
-
-class ServiceExit(Exception):
-    pass
-
-
-def service_shutdown(sig_num, frame):
-    print('Caught signal {}'.format(sig_num))
-    raise ServiceExit
+    @staticmethod
+    def service_shutdown(sig_num, frame):
+        print('Caught signal {}'.format(sig_num))
+        raise bitcoinDataManager.ServiceExit

@@ -27,3 +27,5 @@ Application:
 - html templates are located in bitcoin_app/templates
 - configuration settings are located in bitcoin/settings.py
 - migrations are located in bitcoin_app/migrations
+- in bitcoinDataManager there is logic responsible for getting data from the internet and erasing old data from database
+- getbitcoin command from bitcoin_app/management/commands is responsible for for getting data from the internet and erasing old data from database using bitcoinDataManager. It should be running simultaneously with app. 
