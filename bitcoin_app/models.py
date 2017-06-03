@@ -44,7 +44,7 @@ class Bitcoin(models.Model):
         return time_min_max
 
 
-class bitcoinDataManager(Bitcoin):
+class bitcoinDataManager():
     class GetBitcoinThread(threading.Thread):
         def __init__(self):
             threading.Thread.__init__(self)
