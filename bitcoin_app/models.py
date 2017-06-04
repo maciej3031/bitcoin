@@ -23,7 +23,7 @@ class Bitcoin(models.Model):
     @classmethod
     def get_average_price_last_10min(cls):
 
-        price = Bitcoin.objects.order_by('-time').filter(time__gte=timezone.now() - timezone.timedelta(minutes=10))\
+        price = cls.objects.order_by('-time').filter(time__gte=timezone.now() - timezone.timedelta(minutes=10))\
             .aggregate(Avg('price'))
         return price
 

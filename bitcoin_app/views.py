@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from django.shortcuts import render_to_response
+from django.shortcuts import render
 
 from .models import Bitcoin
 
@@ -11,4 +11,4 @@ def index(request):
     last_10_min = Bitcoin.get_last_10min_time_min_max()
 
     context = {'price': price, 'average': average, 'last_10_min': last_10_min}
-    return render_to_response('bitcoin_app/index.html', context=context)
+    return render(request, 'bitcoin_app/index.html', context=context)

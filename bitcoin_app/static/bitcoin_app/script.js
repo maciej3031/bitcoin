@@ -1,5 +1,5 @@
     $(document).ready(function () {
-    var interval = 1000;
+    var interval = 5000;
     function refresh() {
         $.ajax({
             url: "",
